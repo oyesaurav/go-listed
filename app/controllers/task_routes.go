@@ -3,6 +3,7 @@ package controllers
 import (
 	"log"
 	_ "os"
+	"strings"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
@@ -13,6 +14,33 @@ import (
 )
 
 func GetTasks(c *fiber.Ctx) error {
+	page := c.Query("page", "1")    
+	pageSize := c.Query("pageSize", "10")
+	rawBody := c.Body()
+	task := &models.Task{}
+
+	// Check if there was an error reading the request body.
+	if rawBody == nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": true,
+			"msg":   "Error reading request body",
+		})
+	}
+
+    // Check if the raw body contains the "priority" field.
+    if !strings.Contains(string(rawBody), "priority") {
+        task.Priority = -1
+    }
+
+	// Check, if received JSON data is valid.
+	if err := c.BodyParser(task); err != nil {
+		// Return status 400 and error message.
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": true,
+			"msg":   err.Error(),
+		})
+	}
+
 	db, err := database.OpenDBConnection()
 	if err != nil {
 		// Return status 500 and database connection error.
@@ -22,7 +50,7 @@ func GetTasks(c *fiber.Ctx) error {
 		})
 	}
 
-	tasks, err := db.GetTasks()
+	tasks, err := db.GetTasks(task, pageSize, page)
 
 	if err != nil {
 		// Return status 500 and database query error.

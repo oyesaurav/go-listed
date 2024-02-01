@@ -18,6 +18,7 @@ type Task struct {
 	CreatedAt   time.Time `db:"createdat" json:"created_at"`
 	UpdatedAt   time.Time `db:"updatedat" json:"updated_at"`
 	DeletedAt   time.Time `db:"deletedat" json:"deleted_at"`
+	Priority    int       `db:"priority" json:"priority"`
 	// store a ref to all subtasks
 	// SubTasks    []SubTask `db:"sub_tasks" json:"sub_tasks"`
 }

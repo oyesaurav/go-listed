@@ -15,15 +15,60 @@ type TaskQueries struct {
 }
 
 // GetBooks method for getting all books.
-func (q *TaskQueries) GetTasks() ([]models.Task, error) {
+func (q *TaskQueries) GetTasks(t *models.Task, pageSize string, page string) ([]models.Task, error) {
 	// Define books variable.
 	tasks := []models.Task{}
+	paramCount := 1
+	query := "SELECT * FROM task WHERE deletedat = '0001-01-01 00:00:00'"
+	var params []interface{}
+	// Add filters
+	if t.Priority != -1 {
+		query += " AND priority = " + strconv.Itoa(t.Priority)
+	}
 
-	// Define query string.
-	query := `SELECT * FROM task WHERE deletedat = '0001-01-01 00:00:00'`
+	if !t.DueDate.IsZero() {
+		query += " AND duedate = $" + strconv.Itoa(paramCount)
+		params = append(params, t.DueDate)
+		paramCount++
+	}
+
+	// Add pagination
+	pageInt, _ := strconv.Atoi(page)
+	pageSizeInt, _ := strconv.Atoi(pageSize)
+	query += " ORDER BY createdat DESC LIMIT $" + strconv.Itoa(paramCount) + " OFFSET $" + strconv.Itoa(paramCount+1)
+	params = append(params, pageSizeInt, (pageInt-1)*pageSizeInt)
 
 	// Send query to database.
-	err := q.Select(&tasks, query)
+	err := q.Select(&tasks, query, params...)
+	if err != nil {
+		// Return empty object and error.
+		return tasks, err
+	}
+
+	// Return query result.
+	return tasks, nil
+}
+
+func (q *TaskQueries) GetSubTasks(t *models.SubTask, pageSize string, page string, taskid int) ([]models.SubTask, error) {
+	// Define books variable.
+	tasks := []models.SubTask{}
+	paramCount := 1
+	query := "SELECT * FROM subtask WHERE deletedat = '0001-01-01 00:00:00'"
+	var params []interface{}
+	// Add filters
+	if taskid != -1 {
+		query += " AND taskid = $" + strconv.Itoa(paramCount)
+		params = append(params, t.TaskID)
+		paramCount++
+	}
+	// Add pagination
+	pageInt, _ := strconv.Atoi(page)
+	pageSizeInt, _ := strconv.Atoi(pageSize)
+	query += " ORDER BY createdat DESC LIMIT $" + strconv.Itoa(paramCount) + " OFFSET $" + strconv.Itoa(paramCount+1)
+	params = append(params, pageSizeInt, (pageInt-1)*pageSizeInt)
+
+	// Send query to database.
+	err := q.Select(&tasks, query, params...)
 	if err != nil {
 		// Return empty object and error.
 		return tasks, err
@@ -77,124 +122,106 @@ func (q *TaskQueries) CreateSubTask(t *models.SubTask) error {
 	return nil
 }
 
-func (q *TaskQueries) GetSubTasks() ([]models.SubTask, error) {
-	// Define books variable.
-	tasks := []models.SubTask{}
-
+func (q *TaskQueries) UpdateTask(t *models.Task) error {
 	// Define query string.
-	query := `SELECT * FROM subtask WHERE deletedat = '0001-01-01 00:00:00'`
+	query := "UPDATE task SET"
 
-	// Send query to database.
-	err := q.Select(&tasks, query)
-	if err != nil {
-		// Return empty object and error.
-		return tasks, err
+	// Check which fields are provided and add them to the query.
+	var params []interface{}
+	paramCount := 1 // Counter for placeholder position
+
+	if !t.DueDate.IsZero() {
+		query += " duedate = $" + strconv.Itoa(paramCount) + ","
+		params = append(params, t.DueDate)
+		paramCount++
 	}
 
-	// Return query result.
-	return tasks, nil
-}
+	if t.Status != "" {
+		query += " status = $" + strconv.Itoa(paramCount) + ","
+		params = append(params, t.Status)
+		paramCount++
+	}
 
-func (q *TaskQueries) UpdateTask(t *models.Task) error {
-    // Define query string.
-    query := "UPDATE task SET"
-    
-    // Check which fields are provided and add them to the query.
-    var params []interface{}
-    paramCount := 1  // Counter for placeholder position
-
-    if !t.DueDate.IsZero() {
-        query += " duedate = $" + strconv.Itoa(paramCount) + ","
-        params = append(params, t.DueDate)
-        paramCount++
-    }
-
-    if t.Status != "" {
-        query += " status = $" + strconv.Itoa(paramCount) + ","
-        params = append(params, t.Status)
-        paramCount++
-    }
-
-    // Add more conditions for other fields as needed.
+	// Add more conditions for other fields as needed.
 
 	query += " updatedat = $" + strconv.Itoa(paramCount) + ","
 	params = append(params, t.UpdatedAt)
 	paramCount++
-	
-    // Remove the trailing comma if there are parameters.
-    if len(params) > 0 {
-        query = query[:len(query)-1]
-    }
 
-    // Add the WHERE clause.
-    query += " WHERE id = $" + strconv.Itoa(paramCount) + " AND deletedat = '0001-01-01 00:00:00'"
+	// Remove the trailing comma if there are parameters.
+	if len(params) > 0 {
+		query = query[:len(query)-1]
+	}
+
+	// Add the WHERE clause.
+	query += " WHERE id = $" + strconv.Itoa(paramCount) + " AND deletedat = '0001-01-01 00:00:00'"
 	params = append(params, t.ID)
 
-    // Send query to database.
-    _, err := q.Exec(query, params...)
-    if err != nil {
-        return err
-    }
+	// Send query to database.
+	_, err := q.Exec(query, params...)
+	if err != nil {
+		return err
+	}
 
-    return nil
+	return nil
 }
 
 func (q *TaskQueries) UpdateSubTask(t *models.SubTask) error {
-    // Define query string.
-    query := "UPDATE subtask SET"
-    
-    // Check which fields are provided and add them to the query.
-    var params []interface{}
-    paramCount := 1  // Counter for placeholder position
+	// Define query string.
+	query := "UPDATE subtask SET"
+
+	// Check which fields are provided and add them to the query.
+	var params []interface{}
+	paramCount := 1 // Counter for placeholder position
 
 	query += " status = $" + strconv.Itoa(paramCount) + ","
 	params = append(params, t.Status)
 	paramCount++
 
-    // Add more conditions for other fields as needed.
+	// Add more conditions for other fields as needed.
 
 	query += " updatedat = $" + strconv.Itoa(paramCount) + ","
 	params = append(params, t.UpdatedAt)
 	paramCount++
-	
-    // Remove the trailing comma if there are parameters.
-    if len(params) > 0 {
-        query = query[:len(query)-1]
-    }
 
-    // Add the WHERE clause.
-    query += " WHERE id = $" + strconv.Itoa(paramCount) + " AND deletedat = '0001-01-01 00:00:00'"
+	// Remove the trailing comma if there are parameters.
+	if len(params) > 0 {
+		query = query[:len(query)-1]
+	}
+
+	// Add the WHERE clause.
+	query += " WHERE id = $" + strconv.Itoa(paramCount) + " AND deletedat = '0001-01-01 00:00:00'"
 	params = append(params, t.ID)
 
-    // Send query to database.
-    _, err := q.Exec(query, params...)
-    if err != nil {
-        return err
-    }
+	// Send query to database.
+	_, err := q.Exec(query, params...)
+	if err != nil {
+		return err
+	}
 
-    return nil
+	return nil
 }
 
 func (q *TaskQueries) DeleteTask(t *models.Task) error {
 	query := "UPDATE task SET deletedat = $1 WHERE id = $2 AND deletedat = '0001-01-01 00:00:00'"
 
-    // Send query to database.
-    _, err := q.Exec(query, t.DeletedAt, t.ID)
-    if err != nil {
-        return err
-    }
+	// Send query to database.
+	_, err := q.Exec(query, t.DeletedAt, t.ID)
+	if err != nil {
+		return err
+	}
 
-    return nil
+	return nil
 }
 
 func (q *TaskQueries) DeleteSubTask(t *models.SubTask) error {
 	query := "UPDATE subtask SET deletedat = $1 WHERE id = $2 AND deletedat = '0001-01-01 00:00:00'"
 
-    // Send query to database.
-    _, err := q.Exec(query, t.DeletedAt, t.ID)
-    if err != nil {
-        return err
-    }
+	// Send query to database.
+	_, err := q.Exec(query, t.DeletedAt, t.ID)
+	if err != nil {
+		return err
+	}
 
-    return nil
+	return nil
 }
