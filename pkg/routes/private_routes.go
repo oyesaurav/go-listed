@@ -14,9 +14,11 @@ func PrivateRoutes(a *fiber.App) {
 	route.Get("", middleware.JWTProtected(), controllers.Home)
 
 	// Routes for POST method:
-	route.Post("/task", middleware.JWTProtected(), controllers.CreateTasks) // create a new book
-	route.Post("/subtask", middleware.JWTProtected(), controllers.CreateSubTasks) // create a new book
+	// route.Get("/task", middleware.JWTProtected(), controllers.CreateTasks) 
+	route.Post("/task", middleware.JWTProtected(), controllers.CreateTasks) 
+	route.Post("/subtask", middleware.JWTProtected(), controllers.CreateSubTasks) 
 	route.Patch("/task", middleware.JWTProtected(), controllers.UpdateTasks) 
 	route.Patch("/subtask", middleware.JWTProtected(), controllers.UpdateSubTasks) 
-	
+	route.Delete("/task", middleware.JWTProtected(), controllers.DeleteTasks) 
+	route.Delete("/subtask", middleware.JWTProtected(), controllers.DeleteSubTasks) 
 }

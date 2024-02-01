@@ -127,3 +127,40 @@ func UpdateSubTasks(c *fiber.Ctx) error {
 		"msg":   "Sub-task updated",
 	})
 }
+
+func DeleteSubTasks(c *fiber.Ctx) error {
+	task := &models.SubTask{}
+
+	// Check, if received JSON data is valid.
+	if err := c.BodyParser(task); err != nil {
+		// Return status 400 and error message.
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": true,
+			"msg":   err.Error(),
+		})
+	}
+	db, err := database.OpenDBConnection()
+	if err != nil {
+		// Return status 500 and database connection error.
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": true,
+			"msg":   err.Error(),
+		})
+	}
+
+	task.DeletedAt = time.Now()
+
+	if err := db.DeleteSubTask(task); err != nil {
+		// Return status 500 and error message.
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": true,
+			"msg":   err.Error(),
+		})
+	}
+
+	// Return status 200 OK.
+	return c.JSON(fiber.Map{
+		"error": false,
+		"msg":   "Sub task deleted",
+	})
+}

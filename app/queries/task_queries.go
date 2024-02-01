@@ -20,7 +20,7 @@ func (q *TaskQueries) GetTasks() ([]models.Task, error) {
 	tasks := []models.Task{}
 
 	// Define query string.
-	query := `SELECT * FROM task`
+	query := `SELECT * FROM task WHERE deletedat = '0001-01-01 00:00:00'`
 
 	// Send query to database.
 	err := q.Select(&tasks, query)
@@ -82,7 +82,7 @@ func (q *TaskQueries) GetSubTasks() ([]models.SubTask, error) {
 	tasks := []models.SubTask{}
 
 	// Define query string.
-	query := `SELECT * FROM subtask`
+	query := `SELECT * FROM subtask WHERE deletedat = '0001-01-01 00:00:00'`
 
 	// Send query to database.
 	err := q.Select(&tasks, query)
@@ -127,7 +127,7 @@ func (q *TaskQueries) UpdateTask(t *models.Task) error {
     }
 
     // Add the WHERE clause.
-    query += " WHERE id = $" + strconv.Itoa(paramCount)
+    query += " WHERE id = $" + strconv.Itoa(paramCount) + " AND deletedat = '0001-01-01 00:00:00'"
 	params = append(params, t.ID)
 
     // Send query to database.
@@ -163,11 +163,35 @@ func (q *TaskQueries) UpdateSubTask(t *models.SubTask) error {
     }
 
     // Add the WHERE clause.
-    query += " WHERE id = $" + strconv.Itoa(paramCount)
+    query += " WHERE id = $" + strconv.Itoa(paramCount) + " AND deletedat = '0001-01-01 00:00:00'"
 	params = append(params, t.ID)
 
     // Send query to database.
     _, err := q.Exec(query, params...)
+    if err != nil {
+        return err
+    }
+
+    return nil
+}
+
+func (q *TaskQueries) DeleteTask(t *models.Task) error {
+	query := "UPDATE task SET deletedat = $1 WHERE id = $2 AND deletedat = '0001-01-01 00:00:00'"
+
+    // Send query to database.
+    _, err := q.Exec(query, t.DeletedAt, t.ID)
+    if err != nil {
+        return err
+    }
+
+    return nil
+}
+
+func (q *TaskQueries) DeleteSubTask(t *models.SubTask) error {
+	query := "UPDATE subtask SET deletedat = $1 WHERE id = $2 AND deletedat = '0001-01-01 00:00:00'"
+
+    // Send query to database.
+    _, err := q.Exec(query, t.DeletedAt, t.ID)
     if err != nil {
         return err
     }
