@@ -11,8 +11,10 @@ func PrivateRoutes(a *fiber.App) {
 	// Create routes group.
 	route := a.Group("/api/v1")
 
+	route.Get("", middleware.JWTProtected(), controllers.Home)
+
 	// Routes for POST method:
-	route.Post("/book", middleware.JWTProtected(), controllers.Home) // create a new book
+	route.Post("/task", middleware.JWTProtected(), controllers.CreateTasks) // create a new book
 
 	// Routes for PUT method:
 	route.Put("/book", middleware.JWTProtected(), controllers.Home) // update one book by ID

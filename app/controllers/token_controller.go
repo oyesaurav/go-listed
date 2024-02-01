@@ -23,6 +23,8 @@ func GetNewAccessToken(c *fiber.Ctx) error {
 			"msg":   err.Error(),
 		})
 	}
+	//  set the accee token in Authorization header bearer token
+	c.Response().Header.Add("Authorization", "Bearer "+token)
 
 	return c.JSON(fiber.Map{
 		"error":        false,

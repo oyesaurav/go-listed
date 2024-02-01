@@ -4,7 +4,7 @@ import "github.com/oyesaurav/go-todo/app/queries"
 
 // Queries struct for collect all app queries.
 type Queries struct {
-	*queries.BookQueries // load queries from Book model
+	*queries.TaskQueries // load queries from Book model
 }
 
 // OpenDBConnection func for opening database connection.
@@ -17,6 +17,6 @@ func OpenDBConnection() (*Queries, error) {
 
 	return &Queries{
 		// Set queries from models:
-		BookQueries: &queries.BookQueries{DB: db}, // from Book model
+		TaskQueries: &queries.TaskQueries{DB: db}, // from Book model
 	}, nil
 }
