@@ -15,10 +15,8 @@ func PrivateRoutes(a *fiber.App) {
 
 	// Routes for POST method:
 	route.Post("/task", middleware.JWTProtected(), controllers.CreateTasks) // create a new book
-
-	// Routes for PUT method:
-	route.Put("/book", middleware.JWTProtected(), controllers.Home) // update one book by ID
-
-	// Routes for DELETE method:
-	route.Delete("/book", middleware.JWTProtected(), controllers.Home) // delete one book by ID
+	route.Post("/subtask", middleware.JWTProtected(), controllers.CreateSubTasks) // create a new book
+	route.Patch("/task", middleware.JWTProtected(), controllers.UpdateTasks) 
+	route.Patch("/subtask", middleware.JWTProtected(), controllers.UpdateSubTasks) 
+	
 }

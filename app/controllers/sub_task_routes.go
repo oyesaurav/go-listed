@@ -42,7 +42,7 @@ func GetSubTasks(c *fiber.Ctx) error {
 
 func CreateSubTasks(c *fiber.Ctx) error {
 	// Create new Book struct
-	task := &models.Task{}
+	task := &models.SubTask{}
 
 	// Check, if received JSON data is valid.
 	if err := c.BodyParser(task); err != nil {
@@ -64,7 +64,8 @@ func CreateSubTasks(c *fiber.Ctx) error {
 	validate := utils.NewValidator()
 	task.ID = uuid.New()
 	log.Print(uuid.New().String())
-	task.Status = "TODO"
+	log.Print(task.TaskID)
+	task.Status = 0
 	task.CreatedAt = time.Now()
 	if err := validate.Struct(task); err != nil {
 		// Return, if some fields are not valid.
@@ -74,7 +75,7 @@ func CreateSubTasks(c *fiber.Ctx) error {
 		})
 	}
 
-	if err := db.CreateTask(task); err != nil {
+	if err := db.CreateSubTask(task); err != nil {
 		// Return status 500 and error message.
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": true,
@@ -87,5 +88,42 @@ func CreateSubTasks(c *fiber.Ctx) error {
 		"error": false,
 		"msg":   nil,
 		"task":  task,
+	})
+}
+
+func UpdateSubTasks(c *fiber.Ctx) error {
+	task := &models.SubTask{}
+
+	// Check, if received JSON data is valid.
+	if err := c.BodyParser(task); err != nil {
+		// Return status 400 and error message.
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": true,
+			"msg":   err.Error(),
+		})
+	}
+	db, err := database.OpenDBConnection()
+	if err != nil {
+		// Return status 500 and database connection error.
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": true,
+			"msg":   err.Error(),
+		})
+	}
+
+	task.UpdatedAt = time.Now()
+
+	if err := db.UpdateSubTask(task); err != nil {
+		// Return status 500 and error message.
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": true,
+			"msg":   err.Error(),
+		})
+	}
+
+	// Return status 200 OK.
+	return c.JSON(fiber.Map{
+		"error": false,
+		"msg":   "Sub-task updated",
 	})
 }

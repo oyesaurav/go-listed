@@ -89,3 +89,40 @@ func CreateTasks(c *fiber.Ctx) error {
 		"task":  task,
 	})
 }
+
+func UpdateTasks(c *fiber.Ctx) error {
+	task := &models.Task{}
+
+	// Check, if received JSON data is valid.
+	if err := c.BodyParser(task); err != nil {
+		// Return status 400 and error message.
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": true,
+			"msg":   err.Error(),
+		})
+	}
+	db, err := database.OpenDBConnection()
+	if err != nil {
+		// Return status 500 and database connection error.
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": true,
+			"msg":   err.Error(),
+		})
+	}
+
+	task.UpdatedAt = time.Now()
+
+	if err := db.UpdateTask(task); err != nil {
+		// Return status 500 and error message.
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": true,
+			"msg":   err.Error(),
+		})
+	}
+
+	// Return status 200 OK.
+	return c.JSON(fiber.Map{
+		"error": false,
+		"msg":   "Task updated",
+	})
+}

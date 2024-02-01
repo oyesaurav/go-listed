@@ -23,13 +23,13 @@ type Task struct {
 }
 
 type User struct {
-	ID          uuid.UUID `db:"id" json:"id" validate:"required,uuid"`
+	ID          uuid.UUID `db:"id" json:"id" validate:"required"`
 	PhoneNumber int       `db:"phonenumber" json:"phone_number" validate:"required"`
 	Priority    int       `db:"priority" json:"priority"`
 }
 
 type SubTask struct {
-	ID         uuid.UUID `db:"id" json:"id" validate:"required,uuid"`
+	ID         uuid.UUID `db:"id" json:"id" validate:"required"`
 	TaskID     uuid.UUID `db:"taskid" json:"task_id" validate:"required"`
 	Status     int       `db:"status" json:"status"`
 	CreatedAt  time.Time `db:"createdat" json:"created_at"`
