@@ -6,7 +6,7 @@ Go server to set tasks and subtasks with auto priority update and call reminders
 
 ### 1. Create Task
 
-- **Endpoint:** `POST /api/v1/tasks`
+- **Endpoint:** `POST /api/v1/task`
 - **Input:**
   - Headers: `Authorization: Bearer <jwt-auth-token>`
   - Body:
@@ -20,7 +20,7 @@ Go server to set tasks and subtasks with auto priority update and call reminders
 
 ### 2. Create Sub Task
 
-- **Endpoint:** `POST /api/v1/subtasks`
+- **Endpoint:** `POST /api/v1/subtask`
 - **Input:**
   - Headers: `Authorization: Bearer <jwt-auth-token>`
   - Body:
@@ -32,7 +32,7 @@ Go server to set tasks and subtasks with auto priority update and call reminders
 
 ### 3. Get All User Tasks
 
-- **Endpoint:** `GET /api/v1/tasks?page=1&limit=10`
+- **Endpoint:** `GET /api/v1/task?page=1&limit=10`
 - **Input:**
   - Headers: `Authorization: Bearer <jwt-auth-token>`
   - Body:
@@ -45,7 +45,7 @@ Go server to set tasks and subtasks with auto priority update and call reminders
 
 ### 4. Get All User Sub Tasks
 
-- **Endpoint:** `GET /api/v1/subtasks?page=1&limit=10`
+- **Endpoint:** `GET /api/v1/subtask?page=1&limit=10`
 - **Input:**
   - Headers: `Authorization: Bearer <jwt-auth-token>`
   - Body:
@@ -57,7 +57,7 @@ Go server to set tasks and subtasks with auto priority update and call reminders
 
 ### 5. Update Task
 
-- **Endpoint:** `PUT /api/v1/tasks`
+- **Endpoint:** `PUT /api/v1/task`
 - **Input:**
   - Headers: `Authorization: Bearer <jwt-auth-token>`
   - Body:
@@ -71,7 +71,7 @@ Go server to set tasks and subtasks with auto priority update and call reminders
 
 ### 6. Update Sub Task
 
-- **Endpoint:** `PUT /api/v1/subtasks`
+- **Endpoint:** `PUT /api/v1/subtask`
 - **Input:**
   - Headers: `Authorization: Bearer <jwt-auth-token>`
   - Body:
@@ -84,7 +84,7 @@ Go server to set tasks and subtasks with auto priority update and call reminders
 
 ### 7. Delete Task (Soft Deletion)
 
-- **Endpoint:** `DELETE /api/v1/tasks`
+- **Endpoint:** `DELETE /api/v1/task`
 - **Input:**
   - Headers: `Authorization: Bearer <jwt-auth-token>`
   - Body:
@@ -96,7 +96,7 @@ Go server to set tasks and subtasks with auto priority update and call reminders
 
 ### 8. Delete Sub Task (Soft Deletion)
 
-- **Endpoint:** `DELETE /api/v1/subtasks/`
+- **Endpoint:** `DELETE /api/v1/subtask`
 - **Input:**
   - Headers: `Authorization: Bearer <jwt-auth-token>`
   - Body:
