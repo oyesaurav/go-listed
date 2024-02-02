@@ -29,10 +29,13 @@ func UpdateTaskPriority(task models.Task, db *database.Queries) models.Task {
 	} else {
 		// For other cases, you can add additional priority rules.
 		// For simplicity, we don't change priority in other cases.
-		fmt.Printf("Task ID %d priority not updated. Priority remains: %d\n", task.ID, task.Priority)
+		task.Priority = 3
 	}
 
 	task.UpdatedAt = time.Now()
+	if err := db.UpdateTask(&task); err != nil {
+		fmt.Println("Error updating task priority:", err)
+	}
 
 	if time.Now().After(task.DueDate) {
 		// If the task is not completed, then call the users.

@@ -17,5 +17,5 @@
 go.work
 
 tmp
-.env*
+.env
 client_secret.json
