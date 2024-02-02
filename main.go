@@ -1,7 +1,7 @@
 package main
 
 import (
-	_"fmt"
+	_ "fmt"
 
 	"github.com/oyesaurav/go-todo/pkg/configs"
 	"github.com/oyesaurav/go-todo/pkg/middleware"
@@ -22,5 +22,6 @@ func main() {
 	routes.PublicRoutes(app)
 	routes.PrivateRoutes(app)
 
-	utils.StartServerWithGracefulShutdown(app)
+	utils.CronScheduler()
+	utils.StartServer(app)
 }

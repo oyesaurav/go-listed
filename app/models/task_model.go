@@ -25,7 +25,7 @@ type Task struct {
 
 type User struct {
 	ID          uuid.UUID `db:"id" json:"id" validate:"required"`
-	PhoneNumber int       `db:"phonenumber" json:"phone_number" validate:"required"`
+	PhoneNumber string       `db:"phonenumber" json:"phone_number" validate:"required"`
 	Priority    int       `db:"priority" json:"priority"`
 }
 

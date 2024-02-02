@@ -49,6 +49,22 @@ func (q *TaskQueries) GetTasks(t *models.Task, pageSize string, page string) ([]
 	return tasks, nil
 }
 
+func (q *TaskQueries) GetallTasks() ([]models.Task, error) {
+	// Define books variable.
+	tasks := []models.Task{}
+	query := "SELECT * FROM task WHERE deletedat = '0001-01-01 00:00:00'"
+
+	// Send query to database.
+	err := q.Select(&tasks, query)
+	if err != nil {
+		// Return empty object and error.
+		return tasks, err
+	}
+
+	// Return query result.
+	return tasks, nil
+}
+
 func (q *TaskQueries) GetSubTasks(t *models.SubTask, pageSize string, page string, taskid int) ([]models.SubTask, error) {
 	// Define books variable.
 	tasks := []models.SubTask{}
@@ -224,4 +240,20 @@ func (q *TaskQueries) DeleteSubTask(t *models.SubTask) error {
 	}
 
 	return nil
+}
+
+func (q *TaskQueries) GetallUsers() ([]models.User, error) {
+	// Define books variable.
+	users := []models.User{}
+	query := "SELECT * FROM user_table ORDER BY priority ASC"
+
+	// Send query to database.
+	err := q.Select(&users, query)
+	if err != nil {
+		// Return empty object and error.
+		return users, err
+	}
+
+	// Return query result.
+	return users, nil
 }
